@@ -1,0 +1,5 @@
+<?xml version="1.0"?>
+<CONFIG>
+  <Compiler Value="/usr/bin/fpc" Date="1363527598"/>
+  <Params Value=" -MObjFPC -Scghi -CX -O1 -g -gl -vewnhi -Fi/usr/share/lazarus/1.0.14/components/lazutils -Fl/opt/gnome/lib -Fu/usr/share/lazarus/1.0.14/lcl/units/i386-linux -Fu/usr/share/lazarus/1.0.14/lcl/units/i386-linux/gtk2 -Fu/usr/share/lazarus/1.0.14/components/codetools/units/i386-linux -Fu/usr/share/lazarus/1.0.14/components/custom -Fu/usr/share/lazarus/1.0.14/packager/units/i386-linux -Fu/home/anton/.lazarus/lib/units/i386-linux/gtk2 -Fu/home/anton/.lazarus/lib/LCLBase/units/i386-linux -Fu/usr/share/lazarus/1.0.14/components/lazutils/lib/i386-linux -Fu/home/anton/Проекты/CustomCrypt/ -l -dLCL -dLCLgtk2 Launch.lpr"/>
+</CONFIG>

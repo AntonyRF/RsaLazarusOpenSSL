@@ -1,0 +1,246 @@
+<?xml version="1.0"?>
+<CONFIG>
+  <ProjectSession>
+    <Version Value="9"/>
+    <BuildModes Active="Default"/>
+    <Units Count="13">
+      <Unit0>
+        <Filename Value="Launch.lpr"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="Launch"/>
+        <UsageCount Value="48"/>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
+      </Unit0>
+      <Unit1>
+        <Filename Value="main.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="Form1"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <UnitName Value="Main"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="0"/>
+        <WindowIndex Value="0"/>
+        <TopLine Value="166"/>
+        <CursorPos X="3" Y="135"/>
+        <UsageCount Value="48"/>
+        <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
+      </Unit1>
+      <Unit2>
+        <Filename Value="extendedssl.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="ExtendedSSL"/>
+        <EditorIndex Value="1"/>
+        <WindowIndex Value="0"/>
+        <TopLine Value="286"/>
+        <CursorPos X="68" Y="304"/>
+        <UsageCount Value="44"/>
+        <Loaded Value="True"/>
+      </Unit2>
+      <Unit3>
+        <Filename Value="../openssl/openssl/main.c"/>
+        <WindowIndex Value="0"/>
+        <TopLine Value="1"/>
+        <CursorPos X="52" Y="61"/>
+        <UsageCount Value="18"/>
+        <DefaultSyntaxHighlighter Value="C++"/>
+      </Unit3>
+      <Unit4>
+        <Filename Value="../openssl/openssl/openssl.cbp"/>
+        <WindowIndex Value="0"/>
+        <TopLine Value="1"/>
+        <CursorPos X="1" Y="1"/>
+        <UsageCount Value="7"/>
+        <DefaultSyntaxHighlighter Value="None"/>
+      </Unit4>
+      <Unit5>
+        <Filename Value="../openssl/librsa/main.c"/>
+        <WindowIndex Value="0"/>
+        <TopLine Value="55"/>
+        <CursorPos X="1" Y="50"/>
+        <UsageCount Value="18"/>
+        <DefaultSyntaxHighlighter Value="C++"/>
+      </Unit5>
+      <Unit6>
+        <Filename Value="/usr/share/fpcsrc/2.6.2/packages/openssl/src/openssl.pas"/>
+        <UnitName Value="OpenSSL"/>
+        <WindowIndex Value="0"/>
+        <TopLine Value="1067"/>
+        <CursorPos X="3" Y="1063"/>
+        <UsageCount Value="9"/>
+      </Unit6>
+      <Unit7>
+        <Filename Value="/usr/share/fpcsrc/2.6.2/rtl/inc/dynlibs.pas"/>
+        <UnitName Value="dynlibs"/>
+        <WindowIndex Value="0"/>
+        <TopLine Value="64"/>
+        <CursorPos X="3" Y="67"/>
+        <UsageCount Value="7"/>
+      </Unit7>
+      <Unit8>
+        <Filename Value="/usr/share/fpcsrc/2.6.2/rtl/unix/dynlibs.inc"/>
+        <WindowIndex Value="0"/>
+        <TopLine Value="35"/>
+        <CursorPos X="10" Y="49"/>
+        <UsageCount Value="7"/>
+      </Unit8>
+      <Unit9>
+        <Filename Value="/usr/share/fpcsrc/2.6.2/rtl/unix/dl.pp"/>
+        <UnitName Value="dl"/>
+        <WindowIndex Value="0"/>
+        <TopLine Value="55"/>
+        <CursorPos X="10" Y="69"/>
+        <UsageCount Value="7"/>
+      </Unit9>
+      <Unit10>
+        <Filename Value="/usr/share/fpcsrc/2.6.2/packages/fcl-base/src/libtar.pp"/>
+        <UnitName Value="libtar"/>
+        <WindowIndex Value="0"/>
+        <TopLine Value="598"/>
+        <CursorPos X="42" Y="120"/>
+        <UsageCount Value="7"/>
+      </Unit10>
+      <Unit11>
+        <Filename Value="openssl.pas"/>
+        <UnitName Value="openssl"/>
+        <WindowIndex Value="0"/>
+        <TopLine Value="927"/>
+        <CursorPos X="12" Y="842"/>
+        <UsageCount Value="10"/>
+      </Unit11>
+      <Unit12>
+        <Filename Value="/usr/share/fpcsrc/2.6.2/rtl/inc/objpash.inc"/>
+        <WindowIndex Value="0"/>
+        <TopLine Value="185"/>
+        <CursorPos X="8" Y="187"/>
+        <UsageCount Value="10"/>
+      </Unit12>
+    </Units>
+    <General>
+      <ActiveWindowIndexAtStart Value="0"/>
+    </General>
+    <JumpHistory Count="30" HistoryIndex="29">
+      <Position1>
+        <Filename Value="extendedssl.pas"/>
+        <Caret Line="210" Column="30" TopLine="195"/>
+      </Position1>
+      <Position2>
+        <Filename Value="extendedssl.pas"/>
+        <Caret Line="209" Column="42" TopLine="195"/>
+      </Position2>
+      <Position3>
+        <Filename Value="extendedssl.pas"/>
+        <Caret Line="210" Column="30" TopLine="196"/>
+      </Position3>
+      <Position4>
+        <Filename Value="extendedssl.pas"/>
+        <Caret Line="70" Column="44" TopLine="57"/>
+      </Position4>
+      <Position5>
+        <Filename Value="extendedssl.pas"/>
+        <Caret Line="235" Column="30" TopLine="223"/>
+      </Position5>
+      <Position6>
+        <Filename Value="extendedssl.pas"/>
+        <Caret Line="339" Column="48" TopLine="332"/>
+      </Position6>
+      <Position7>
+        <Filename Value="main.pas"/>
+        <Caret Line="176" Column="35" TopLine="157"/>
+      </Position7>
+      <Position8>
+        <Filename Value="main.pas"/>
+        <Caret Line="170" Column="31" TopLine="157"/>
+      </Position8>
+      <Position9>
+        <Filename Value="main.pas"/>
+        <Caret Line="189" Column="73" TopLine="168"/>
+      </Position9>
+      <Position10>
+        <Filename Value="main.pas"/>
+        <Caret Line="180" Column="50" TopLine="175"/>
+      </Position10>
+      <Position11>
+        <Filename Value="main.pas"/>
+        <Caret Line="185" Column="29" TopLine="174"/>
+      </Position11>
+      <Position12>
+        <Filename Value="main.pas"/>
+        <Caret Line="189" Column="32" TopLine="175"/>
+      </Position12>
+      <Position13>
+        <Filename Value="main.pas"/>
+        <Caret Line="186" Column="68" TopLine="175"/>
+      </Position13>
+      <Position14>
+        <Filename Value="main.pas"/>
+        <Caret Line="190" Column="58" TopLine="176"/>
+      </Position14>
+      <Position15>
+        <Filename Value="main.pas"/>
+        <Caret Line="192" Column="51" TopLine="173"/>
+      </Position15>
+      <Position16>
+        <Filename Value="main.pas"/>
+        <Caret Line="185" Column="44" TopLine="172"/>
+      </Position16>
+      <Position17>
+        <Filename Value="main.pas"/>
+        <Caret Line="190" Column="29" TopLine="176"/>
+      </Position17>
+      <Position18>
+        <Filename Value="main.pas"/>
+        <Caret Line="188" Column="47" TopLine="173"/>
+      </Position18>
+      <Position19>
+        <Filename Value="main.pas"/>
+        <Caret Line="183" Column="17" TopLine="179"/>
+      </Position19>
+      <Position20>
+        <Filename Value="main.pas"/>
+        <Caret Line="213" Column="29" TopLine="198"/>
+      </Position20>
+      <Position21>
+        <Filename Value="main.pas"/>
+        <Caret Line="209" Column="79" TopLine="198"/>
+      </Position21>
+      <Position22>
+        <Filename Value="main.pas"/>
+        <Caret Line="194" Column="47" TopLine="185"/>
+      </Position22>
+      <Position23>
+        <Filename Value="main.pas"/>
+        <Caret Line="193" Column="47" TopLine="184"/>
+      </Position23>
+      <Position24>
+        <Filename Value="main.pas"/>
+        <Caret Line="186" Column="13" TopLine="174"/>
+      </Position24>
+      <Position25>
+        <Filename Value="main.pas"/>
+        <Caret Line="187" Column="13" TopLine="175"/>
+      </Position25>
+      <Position26>
+        <Filename Value="main.pas"/>
+        <Caret Line="155" Column="1" TopLine="153"/>
+      </Position26>
+      <Position27>
+        <Filename Value="main.pas"/>
+        <Caret Line="154" Column="1" TopLine="152"/>
+      </Position27>
+      <Position28>
+        <Filename Value="main.pas"/>
+        <Caret Line="153" Column="1" TopLine="151"/>
+      </Position28>
+      <Position29>
+        <Filename Value="main.pas"/>
+        <Caret Line="152" Column="1" TopLine="150"/>
+      </Position29>
+      <Position30>
+        <Filename Value="main.pas"/>
+        <Caret Line="153" Column="1" TopLine="151"/>
+      </Position30>
+    </JumpHistory>
+  </ProjectSession>
+</CONFIG>

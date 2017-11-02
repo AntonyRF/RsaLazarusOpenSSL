@@ -14,9 +14,10 @@ type
   { TForm1 }
 
   TForm1 = class(TForm)
-    MainMenu:  TMainMenu;
-    Memo:      TMemo;
+    MainMenu: TMainMenu;
+    Memo: TMemo;
     MenuItem1: TMenuItem;
+    MenuItemSign: TMenuItem;
     MenuItem2: TMenuItem;
     MenuItem3: TMenuItem;
     MenuItem4: TMenuItem;
@@ -35,6 +36,7 @@ type
     procedure MenuItem6Click(Sender: TObject);
     procedure MenuItem7Click(Sender: TObject);
     procedure MenuItem9Click(Sender: TObject);
+    procedure MenuItemSignClick(Sender: TObject);
   private
     { private declarations }
   public
@@ -42,12 +44,12 @@ type
   end;
 
 var
-  Form1:     TForm1;
+  Form1: TForm1;
   CustomRSA: TCustomRSA;
 
 implementation
 
-{$R *.lfm}
+{$R *.frm}
 
 { TForm1 }
 
@@ -62,19 +64,19 @@ end;
 
 procedure TForm1.Button1Click(Sender: TObject);
 var
-  PriKey:  string;
-  PubKey:  string;
-  RSA:     PRSA;
+  PriKey: string;
+  PubKey: string;
+  RSA: PRSA;
   OrigMsg, EncMsg: PChar;
-  EncLen:  integer;
-  err:     PChar;
+  EncLen: integer;
+  err: PChar;
   OrigLen: integer;
 begin
   Memo.Clear;
   // Генерируем пару ключей
   PubKey := '';
   PriKey := '';
-  RSA    := GenRsaKeys(512, PriKey, PubKey);
+  RSA := GenRsaKeys(512, PriKey, PubKey);
 
   // Отображаем это в мемо
   memo.Append(PriKey);
@@ -182,9 +184,9 @@ end;
 
 procedure TForm1.MenuItem9Click(Sender: TObject);
 var
-  EncMsg:  PByte;
+  EncMsg: PByte;
   OrigMsg: PByte;
-  EncLen:  cint;
+  EncLen: cint;
   OrigLen: SizeInt;
 begin
   Memo.Append('Кодируем: ');
@@ -217,6 +219,108 @@ begin
 
   FreeMem(EncMsg);
   FreeMem(OrigMsg);
+end;
+
+function sign(const msg: Pointer; mlen: SizeUInt; sig: PChar; slen: PSizeUInt; pkey: PEVP_PKEY): boolean;
+  // Подпись
+var
+  mdctx: PEVP_MD_CTX;
+begin
+  Result := False;
+
+  mdctx := nil;
+  sig := nil;
+
+  try
+    // Создаём цифровой контекст сообщения
+    mdctx := EVP_MD_CTX_create();
+    if mdctx = nil then
+      raise Exception.Create('Не смог создать цифровой контекст сообщения...');
+
+    // Инициализация DigestSign, SHA-256 выбрана для примера
+    if EVP_DigestSignInit(mdctx, nil, EVP_sha256(), nil, pkey) <> 1 then
+      raise Exception.Create('');
+
+    // Обновим для сообщения
+    if EVP_DigestSignUpdate(mdctx, msg, strlen(msg)) <> 1 then
+      raise Exception.Create('');
+
+    // Завершаем операцию цифровой подписи
+    // Сеачала вызовем EVP_DigestSignFinal с нулевым параметром sig, чтобы получить длину подписи. Длина будет возвращена
+    // с помощью slen
+    if EVP_DigestSignFinal(mdctx, nil, slen) <> 1 then
+      raise Exception.Create('');
+
+    // Выделим память для сигнатуры
+    sig := OPENSSL_malloc(slen^);
+    if sig = nil then
+      raise Exception.Create('');
+
+    // Ну наконец-то получим сигнатуру
+    if EVP_DigestSignFinal(mdctx, sig, slen) <> 1 then
+      raise Exception.Create('');
+
+    Result := True;
+
+  finally
+    // Смываем за собой
+  {  if (sig <> nil) and (not Result) then
+      OPENSSL_free(sig);    }
+    if (mdctx <> nil) then
+      EVP_MD_CTX_destroy(mdctx);
+  end;
+end;
+
+function verify(const msg: PAnsiChar; pkey: PEVP_PKEY): boolean;
+var
+  mdctx: PEVP_MD_CTX;
+  slen: SizeUInt;
+  sig: Pointer;
+begin
+  Result := False;
+  mdctx := nil;
+  try
+    // Создаём цифровой контекст сообщения
+    mdctx := EVP_MD_CTX_create();
+    if mdctx = nil then
+      raise Exception.Create('Не смог создать цифровой контекст сообщения...');
+
+    // Инициализируем pkey как публичный ключ
+    if EVP_DigestVerifyInit(mdctx, nil, EVP_sha256(), nil, pkey) <> 1 then
+      raise Exception.Create('Произошла ошибка при инициализации операции проверки подписи');
+
+    if EVP_DigestVerifyUpdate(mdctx, msg, strlen(msg)) <> 1 then
+      raise Exception.Create('Произошла ошибка при проверке подписи');
+
+    // Заканчиваем проверку
+    Result := EVP_DigestVerifyFinal(mdctx, sig, slen) = 1;
+
+  finally
+    if (mdctx <> nil) then
+      EVP_MD_CTX_destroy(mdctx);
+  end;
+end;
+
+procedure TForm1.MenuItemSignClick(Sender: TObject);
+var
+  Rsa: TCustomRSA;
+  Message: PChar;
+  sig: PChar;
+  slen: PSizeUInt;
+begin
+  Rsa := TCustomRSA.Create;
+  try
+    Rsa.GenKeys;
+    Message := 'Hello World!';
+    if sign(Message, strlen(Message), sig, slen, rsa.PriKey) then
+      Memo.Append('--- SIGNED MSG ---')
+    else
+      Memo.Append('--- SIGNED ERR ---');
+
+  finally
+    OPENSSL_free(sig);
+    Rsa.Free;
+  end;
 end;
 
 

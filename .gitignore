@@ -51,3 +51,7 @@
 # Delphi history and backups
 __history/
 *.~*
+*.ppu
+*.o
+*.or
+Launch

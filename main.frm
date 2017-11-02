@@ -4,15 +4,15 @@ object Form1: TForm1
   Top = 229
   Width = 551
   Caption = 'Form1'
-  ClientHeight = 319
+  ClientHeight = 340
   ClientWidth = 551
   Menu = MainMenu
   OnCreate = FormCreate
   OnDestroy = FormDestroy
-  LCLVersion = '1.0.14.0'
+  LCLVersion = '6.1'
   object Memo: TMemo
     Left = 0
-    Height = 319
+    Height = 340
     Top = 0
     Width = 551
     Align = alClient
@@ -24,8 +24,8 @@ object Form1: TForm1
     TabOrder = 0
   end
   object MainMenu: TMainMenu
-    left = 137
-    top = 36
+    Left = 137
+    Top = 36
     object MenuItem1: TMenuItem
       Caption = 'RawRSA'
       OnClick = Button1Click
@@ -54,6 +54,10 @@ object Form1: TForm1
         Caption = 'RSA - Кодировать и Раскодировать'
         OnClick = MenuItem9Click
       end
+    end
+    object MenuItemSign: TMenuItem
+      Caption = 'Цифровая подпись'
+      OnClick = MenuItemSignClick
     end
     object MenuItem3: TMenuItem
       Caption = 'Очистить экран'

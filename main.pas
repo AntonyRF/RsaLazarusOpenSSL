@@ -225,6 +225,7 @@ function sign(const msg: Pointer; mlen: SizeUInt; sig: PChar; slen: PSizeUInt; p
   // Подпись
 var
   mdctx: PEVP_MD_CTX;
+  HashFunc: PEVP_MD;
 begin
   Result := False;
 
@@ -238,8 +239,9 @@ begin
       raise Exception.Create('Не смог создать цифровой контекст сообщения...');
 
     // Инициализация DigestSign, SHA-256 выбрана для примера
-    if EVP_DigestSignInit(mdctx, nil, EVP_sha256(), nil, pkey) <> 1 then
-      raise Exception.Create('');
+    HashFunc := EVP_sha256();
+    if EVP_DigestSignInit(mdctx, nil, HashFunc, nil, pkey) <> 1 then
+      raise Exception.Create(GetCryptErrText());
 
     // Обновим для сообщения
     if EVP_DigestSignUpdate(mdctx, msg, strlen(msg)) <> 1 then
@@ -318,7 +320,8 @@ begin
       Memo.Append('--- SIGNED ERR ---');
 
   finally
-    OPENSSL_free(sig);
+    if sig <> nil then
+      OPENSSL_free(sig);
     Rsa.Free;
   end;
 end;

@@ -39,15 +39,13 @@ type
   TEVP_DigestSignInit = function(ctx: PEVP_MD_CTX;
     pctx: Pointer {На самом деле указатель на указатель на EVP_PKEY_CTX, но некогда описывать EVP_PKEY_CTX};
     const evp_type: Pointer {EVP_MD}; e: Pointer {*ENGINE}; pkey: PEVP_PKEY): integer; cdecl;
-  TEVP_DigestSignUpdate = function(ctx: PEVP_MD_CTX; d: pointer; cnt: UInt32): integer; cdecl;
   TEVP_DigestSignFinal = function(ctx: PEVP_MD_CTX; sig: PAnsiChar; siglen: PSizeUInt): integer; cdecl;
-  TOPENSSL_malloc = function(num: SizeUInt): Pointer; cdecl;
-  TOPENSSL_free = procedure(addr: Pointer); cdecl;
+  TCRYPTO_malloc = function(length: longint; const f: PChar; line: integer): pointer; cdecl;
+  TCRYPTO_free = procedure(str: pointer); cdecl;
   TEVP_MD_CTX_destroy = procedure(ctx: PEVP_MD_CTX); cdecl;
   TEVP_DigestVerifyInit = function(ctx: PEVP_MD_CTX;
     pctx: Pointer {На самом деле указатель на указатель на EVP_PKEY_CTX, но некогда описывать EVP_PKEY_CTX};
     const evp_type: Pointer {EVP_MD}; e: Pointer {*ENGINE}; pkey: PEVP_PKEY): integer; cdecl;
-  TEVP_DigestVerifyUpdate = function(ctx: PEVP_MD_CTX; d: pointer; cnt: UInt32): integer; cdecl;
   TEVP_DigestVerifyFinal = function(ctx: PEVP_MD_CTX; sig: PAnsiChar; siglen: SizeUInt): integer; cdecl;
   TBN_set_word = function(a: Pointer; w: UInt32): integer; cdecl;
   TBN_new = function(): Pointer; cdecl;
@@ -63,7 +61,7 @@ type
     ErrMsg: PChar;
   public
     constructor Create;
-    destructor Destroy; virtual;
+    destructor Destroy; override;
   public
     PrivateKey: string;
     PublicKey: string;
@@ -74,6 +72,7 @@ type
     procedure CloseKeys;
   public
     function PemToRsa(Pem: Pointer; Flag: integer = 0): PRSA;
+    procedure SaveDer(Mem: Pointer; MSize: integer = 0);
     procedure SaveKeyPair(PathToPubKey, PathToPriKey: string);
   public
     procedure LoadPubKeyFromFile(FileName: string);
@@ -91,13 +90,11 @@ var
   EVP_sha256: TEVP_sha256;
   EVP_MD_CTX_create: TEVP_MD_CTX_create;
   EVP_DigestSignInit: TEVP_DigestSignInit;
-  EVP_DigestSignUpdate: TEVP_DigestSignUpdate;
   EVP_DigestSignFinal: TEVP_DigestSignFinal;
-  OPENSSL_malloc: TOPENSSL_malloc;
-  OPENSSL_free: TOPENSSL_free;
+  CRYPTO_malloc: TCRYPTO_malloc;
+  CRYPTO_free: TCRYPTO_free;
   EVP_MD_CTX_destroy: TEVP_MD_CTX_destroy;
   EVP_DigestVerifyInit: TEVP_DigestVerifyInit;
-  EVP_DigestVerifyUpdate: TEVP_DigestVerifyUpdate;
   EVP_DigestVerifyFinal: TEVP_DigestVerifyFinal;
   BN_set_word: TBN_set_word;
   BN_new: TBN_new;
@@ -108,8 +105,47 @@ function GenRsaKeys(KeySize: integer; var PriKey: string; var PubKey: string): P
 function EncryptRsa(KeyPair: PRSA; var OrigMsg: PByte; LenMsg: integer; var EncMsg: PByte; var EncLen: integer; var err: PChar): integer;
 function DecryptRsa(KeyPair: PRSA; var OrigMsg: PByte; var LenMsg: integer; var EncMsg: PByte; var EncLen: integer; var err: PChar): integer;
 procedure CloseRSA(KeyPair: PRSA);
+function OPENSSL_malloc(length: longint): pointer; inline;
+procedure OPENSSL_free(address: pointer); inline;
+function EVP_DigestSignUpdate(ctx: PEVP_MD_CTX; const d: Pointer; cnt: csize_t): cint; inline;
+function EVP_DigestVerifyUpdate(ctx: PEVP_MD_CTX; const d: Pointer; cnt: csize_t): cint; inline;
+
+function GetCryptErrText: string;
+
 
 implementation
+
+function OPENSSL_malloc(length: longint): pointer; inline;
+  // Грёбанный макрос
+begin
+  OPENSSL_malloc := CRYPTO_malloc(length, nil, 0);
+end;
+
+procedure OPENSSL_free(address: pointer); inline;
+// Грёбанный макрос
+begin
+  CRYPTO_free(address);
+end;
+
+function EVP_DigestSignUpdate(ctx: PEVP_MD_CTX; const d: Pointer; cnt: csize_t): cint; inline;
+  // Грёбанный макрос
+begin
+  Result := EVP_DigestUpdate(ctx, d, cnt);
+end;
+
+function EVP_DigestVerifyUpdate(ctx: PEVP_MD_CTX; const d: Pointer; cnt: csize_t): cint; inline;
+  // Грёбанный макрос
+begin
+  Result := EVP_DigestUpdate(ctx, d, cnt);
+end;
+
+function GetCryptErrText: string;
+var
+  err: PChar;
+begin
+  Err_Error_String(ErrGetError(), err);
+  Result := StrPas(Err);
+end;
 
 procedure DoUnloadOpenSSL;
 begin
@@ -135,10 +171,10 @@ begin
   if hLibCrypto = 0 then
     raise Exception.Create('Error loading ' + DLLUtilName);
   {$ELSE}
-  hLibSSL := LoadLibrary(DLLSSLName + '.so');
+  hLibSSL := LoadLibrary('libssl.so.1.0.2');
   if hLibSSL = 0 then
     raise Exception.Create('Error loading ' + DLLSSLName);
-  hLibCrypto := LoadLibrary(DLLUtilName + '.so');
+  hLibCrypto := LoadLibrary('libcrypto.so.1.0.2');
   if hLibCrypto = 0 then
     raise Exception.Create('Error loading ' + DLLUtilName);
   {$ENDIF Windows}
@@ -154,39 +190,37 @@ begin
   PEM_read_bio_RSAPrivateKey := TPEM_read_bio_RSAPrivateKey(LoadFunc(hLibSSL, 'PEM_read_bio_RSAPrivateKey'));
   PEM_read_bio_RSAPublicKey := TPEM_read_bio_RSAPublicKey(LoadFunc(hLibSSL, 'PEM_read_bio_RSAPublicKey'));
   EVP_MD_CTX_create := TEVP_MD_CTX_create(LoadFunc(hLibCrypto, 'EVP_MD_CTX_create'));
+  EVP_MD_CTX_destroy := TEVP_MD_CTX_destroy(LoadFunc(hLibCrypto, 'EVP_MD_CTX_destroy'));
   EVP_sha256 := TEVP_sha256(LoadFunc(hLibCrypto, 'EVP_sha256'));
   EVP_DigestSignInit := TEVP_DigestSignInit(LoadFunc(hLibCrypto, 'EVP_DigestSignInit'));
-  EVP_DigestSignUpdate := TEVP_DigestSignUpdate(LoadFunc(hLibCrypto, 'EVP_DigestSignUpdate'));
   EVP_DigestSignFinal := TEVP_DigestSignFinal(LoadFunc(hLibCrypto, 'EVP_DigestSignFinal'));
-  OPENSSL_malloc := TOPENSSL_malloc(LoadFunc(hLibCrypto, 'OPENSSL_malloc'));
-  OPENSSL_free := TOPENSSL_free(LoadFunc(hLibCrypto, 'OPENSSL_free'));
-  EVP_MD_CTX_destroy := TEVP_MD_CTX_destroy(LoadFunc(hLibCrypto, 'EVP_MD_CTX_destroy'));
+  CRYPTO_malloc := TCRYPTO_malloc(LoadFunc(hLibCrypto, 'CRYPTO_malloc'));
+  CRYPTO_free := TCRYPTO_free(LoadFunc(hLibCrypto, 'CRYPTO_free'));
   EVP_DigestVerifyInit := TEVP_DigestVerifyInit(LoadFunc(hLibCrypto, 'EVP_DigestVerifyInit'));
-  EVP_DigestVerifyUpdate := TEVP_DigestVerifyUpdate(LoadFunc(hLibCrypto, 'EVP_DigestVerifyUpdate'));
   EVP_DigestVerifyFinal := TEVP_DigestVerifyFinal(LoadFunc(hLibCrypto, 'EVP_DigestVerifyFinal'));
   BN_set_word := TBN_set_word(LoadFunc(hLibCrypto, 'BN_set_word'));
   BN_new := TBN_new(LoadFunc(hLibCrypto, 'BN_new'));
 end;
 
 function GenRsaKeys(KeySize: integer; var PriKey: string; var PubKey: string): PRSA;
-const
-  RSA_F4: clong = 65537;
+{const
+  RSA_F4: clong = 65537;   }
 var
   PriLen, PubLen: integer;
   KeyPair: PRSA;
   Pri: PBIO;
   Pub: PBIO;
-  rsa: PRSA;
+ { rsa: PRSA;
   e: UInt32;
   ret: integer;
-  bne: Pointer;
+  bne: Pointer;   }
 begin
-  e := RSA_F4;
+ { e := RSA_F4;
   rsa := RSA_new();
   bne := BN_new();
   ret := BN_set_word(bne, e);
-  KeyPair := RSA_generate_key_ex(rsa, KeySize, bne, nil);
-  //  KeyPair := RsaGenerateKey(KeySize, PUB_EXP, nil, nil); - Устарело =\
+  KeyPair := RSA_generate_key_ex(rsa, KeySize, bne, nil);   }
+  KeyPair := RsaGenerateKey(KeySize, PUB_EXP, nil, nil); //- Устарело =\
   Pri := BioNew(BioSMem);
   Pub := BioNew(BioSMem);
   PEM_write_bio_RSAPrivateKey(pri, keypair, nil, nil, nil, nil, nil);
@@ -238,11 +272,13 @@ end;
 constructor TCustomRSA.Create;
 begin
   GetMem(ErrMsg, MAX_PATH);
+  KeySize := 2048;
 end;
 
 destructor TCustomRSA.Destroy;
 begin
   FreeMem(ErrMsg);
+  inherited;
 end;
 
 //******************************************************************************
@@ -294,7 +330,6 @@ var
 begin
   Result := nil;
   GetMem(err, MAX_PATH);
-  ERR_load_crypto_strings();
   TmpRsa := nil;
   KeyBIO := BIO_new_mem_buf(Pem, -1);
   if KeyBIO = nil then
@@ -319,6 +354,19 @@ begin
       abort;
     end;
   end;
+end;
+
+procedure TCustomRSA.SaveDer(Mem: Pointer; MSize: integer);
+var
+  KeyBIO: PBIO;
+begin
+  KeyBIO := BIO_new_mem_buf(Pchar(PrivateKey), -1);
+  if KeyBIO = nil then
+    raise Exception.Create('Failed to create key PBIO ' + GetCryptErrText());
+    {               
+  x509 = PEM_read_bio_X509(bio, NULL, NULL, NULL);
+  i2dX509bio(KeyBIO, x509);
+                                }
 end;
 
 //******************************************************************************
